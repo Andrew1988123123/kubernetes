@@ -1,0 +1,274 @@
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  name: rabbitmq
+spec:
+  persistence:
+    storageClassName: openebs-hostpath
+  replicas: 3
+  rabbitmq:
+    additionalPlugins:
+      - rabbitmq_management
+      - rabbitmq_peer_discovery_k8s
+      - rabbitmq_prometheus
+    additionalConfig: |
+      loopback_users.guest = false
+      default_user = guest3
+      default_pass = guest3
+      default_user_tags.administrator = true
+---
+
+#apiVersion: rabbitmq.com/v1beta1
+#kind: RabbitmqCluster
+#metadata:
+#  name: hello-world
+#spec:
+#  persistence:
+#    storageClassName: openebs-hostpath
+#  replicas: 3
+#  override:
+#    statefulSet:
+#      spec:
+#        template:
+#          spec:
+#            containers: []
+#            hostAliases:
+#              - ip: "127.0.0.1"
+#                hostnames:
+#                  - "hello-world-server-0.hello-world-nodes.default"
+#                  - "hello-world-server-1.hello-world-nodes.default"
+#                  - "hello-world-server-2.hello-world-nodes.default"
+#  rabbitmq:
+#    additionalPlugins:
+#      - rabbitmq_management
+#      - rabbitmq_peer_discovery_k8s
+#      - rabbitmq_prometheus
+#    additionalConfig: |
+#      loopback_users.guest = false
+#      default_user = guest3
+#      default_pass = guest3
+#      default_user_tags.administrator = true
+#  service:
+#    type: LoadBalancer
+#---
+#
+#apiVersion: rabbitmq.com/v1beta1
+#kind: Permission
+#metadata:
+#  name: rabbitmq-guest-permission
+#spec:
+#  vhost: /
+#  user: guest
+#  permissions:
+#    write: ".*"
+#    configure: ".*"
+#    read: ".*"
+#  rabbitmqClusterReference:
+#    name: rabbitmq
+#---
+
+#apiVersion: rabbitmq.com/v1beta1
+#kind: RabbitmqCluster
+#metadata:
+#  labels:
+#    app: rabbitmq
+#  name: rabbitmq
+##  namespace: rabbitmq-system
+#spec:
+#  replicas: 1
+#  image: rabbitmq:3.9.11
+#  service:
+#    type: ClusterIP
+#  persistence:
+#    storageClassName: openebs-hostpath
+#    storage: 8
+#  rabbitmq:
+#    additionalPlugins:
+#      - rabbitmq_management
+#      - rabbitmq_peer_discovery_k8s
+#      - rabbitmq_prometheus
+#    additionalConfig: |
+#      vm_memory_high_watermark_paging_ratio = 0.85
+#      cluster_formation.node_cleanup.interval = 10
+#      cluster_partition_handling = autoheal
+#      queue_master_locator = min-masters
+#      loopback_users.guest = false
+#      default_user = guest
+#      default_pass = guest
+#    advancedConfig: ""
+#---
+#apiVersion: v1
+#kind: PersistentVolume
+#metadata:
+#  name: rabbitmq-pv1
+#  namespace: rabbitmq-system
+#spec:
+#  capacity:
+#    storage: 30Gi
+#  volumeMode: Filesystem
+#  accessModes:
+#    - ReadWriteOnce
+#  persistentVolumeReclaimPolicy: Delete
+#  storageClassName: openebs-device
+#  local:
+#    path: /mnt/rabbitmq
+#  nodeAffinity:
+#    required:
+#      nodeSelectorTerms:
+#        - matchExpressions:
+#            - key: kubernetes.io/hostname
+#              operator: In
+#              values:
+#                - node1
+#---
+
+
+#apiVersion: v1
+#kind: PersistentVolume
+#metadata:
+#  name: rabbitmq-pv2
+#  namespace: rabbitmq-system
+#spec:
+#  capacity:
+#    storage: 30Gi
+#  volumeMode: Filesystem
+#  accessModes:
+#    - ReadWriteOnce
+#  persistentVolumeReclaimPolicy: Delete
+#  storageClassName: openebs-device
+#  local:
+#    path: /mnt/rabbitmq
+#  nodeAffinity:
+#    required:
+#      nodeSelectorTerms:
+#        - matchExpressions:
+#            - key: kubernetes.io/hostname
+#              operator: In
+#              values:
+#                - node2
+#---
+#apiVersion: v1
+#kind: PersistentVolume
+#metadata:
+#  name: rabbitmq-pv3
+#  namespace: rabbitmq-system
+#spec:
+#  capacity:
+#    storage: 30Gi
+#  volumeMode: Filesystem
+#  accessModes:
+#    - ReadWriteOnce
+#  persistentVolumeReclaimPolicy: Delete
+#  storageClassName: openebs-device
+#  local:
+#    path: /mnt/rabbitmq
+#  nodeAffinity:
+#    required:
+#      nodeSelectorTerms:
+#        - matchExpressions:
+#            - key: kubernetes.io/hostname
+#              operator: In
+#              values:
+#                - node3
+#---
+
+#apiVersion: rabbitmq.com/v1beta1
+#kind: RabbitmqCluster
+#metadata:
+#  name: production-rabbitmqcluster
+#spec:
+#  replicas: 3
+#  persistence:
+#    storageClassName: local-storage
+#  resources:
+#    requests:
+#      cpu: 500m
+#      memory: 1Gi
+#    limits:
+#      cpu: 1
+#      memory: 2Gi
+#  rabbitmq:
+#    additionalPlugins:
+#      - rabbitmq_management
+#      - rabbitmq_peer_discovery_k8s
+#      - rabbitmq_prometheus
+#    additionalConfig: |
+#      log.console.level = info
+#      channel_max = 1700
+#      cluster_formation.peer_discovery_backend = rabbit_peer_discovery_k8s
+#      cluster_formation.k8s.host = kubernetes.default.svc.cluster.local
+#      cluster_formation.k8s.address_type = hostname
+#      vm_memory_high_watermark_paging_ratio = 0.85
+#      cluster_formation.node_cleanup.interval = 10
+#      cluster_partition_handling = autoheal
+#      queue_master_locator = min-masters
+#      loopback_users.guest = false
+#      default_user = guest
+#      default_pass = guest
+#      default_user_tags.administrator = true
+#
+#  service:
+#    type: NodePort
+#
+#---
+#apiVersion: v1
+#kind: PersistentVolumeClaim
+#metadata:
+#  name: production-rabbitmqcluster-server-0
+#spec:
+#  storageClassName: local-storage
+#  accessModes:
+#    - ReadWriteOnce
+#  resources:
+#    requests:
+#      storage: 3Gi
+#---
+#apiVersion: v1
+#kind: PersistentVolumeClaim
+#metadata:
+#  name: production-rabbitmqcluster-server-1
+#spec:
+#  storageClassName: local-storage
+#  accessModes:
+#    - ReadWriteOnce
+#  resources:
+#    requests:
+#      storage: 3Gi
+#---
+#apiVersion: v1
+#kind: PersistentVolumeClaim
+#metadata:
+#  name: production-rabbitmqcluster-server-2
+#spec:
+#  storageClassName: local-storage
+#  accessModes:
+#    - ReadWriteOnce
+#  resources:
+#    requests:
+#      storage: 3Gi
+#---
+
+
+
+
+#apiVersion: rabbitmq.com/v1beta1
+#kind: RabbitmqCluster
+#metadata:
+#  name: rabbitmq-custom-configuration
+#spec:
+#  replicas: 1
+#  rabbitmq:
+#    additionalConfig: |
+#      log.console.level = debug
+#---
+#apiVersion: v1
+#kind: PersistentVolumeClaim
+#metadata:
+#  name: openebs-device-pvc
+#spec:
+#  storageClassName: openebs-device
+#  accessModes:
+#    - ReadWriteOnce
+#  resources:
+#    requests:
+#      storage: 5G
